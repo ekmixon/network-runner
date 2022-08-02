@@ -25,9 +25,7 @@ class TypeValidator(object):
 
     def __call__(self, value):
         if value is not None and not isinstance(value, self.type):
-            raise TypeError(
-                "value must be {}, got {}".format(self.type, type(value))
-            )
+            raise TypeError(f"value must be {self.type}, got {type(value)}")
 
 
 class RequiredValueValidator(object):

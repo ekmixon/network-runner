@@ -26,7 +26,7 @@ from six import iteritems
 class Index(MutableSequence):
 
     def __init__(self, cls):
-        self.items = list()
+        self.items = []
         self.cls = cls
 
     def __repr__(self):
@@ -142,7 +142,7 @@ class Map(MutableMapping):
             if kwargs[self.key] in self:
                 raise ValueError("item already exists")
         except KeyError:
-            raise ValueError("missing required argument: {}".format(self.key))
+            raise ValueError(f"missing required argument: {self.key}")
 
         obj = self.cls(**kwargs)
         self.add(obj)
@@ -160,12 +160,9 @@ class Map(MutableMapping):
     deserialize = __setstate__
 
     def __getstate__(self):
-        obj = {}
-        for key, value in iteritems(self.objects):
-            if hasattr(value, 'serialize'):
-                obj[key] = value.serialize()
-            else:
-                obj[key] = value
-        return obj
+        return {
+            key: value.serialize() if hasattr(value, 'serialize') else value
+            for key, value in iteritems(self.objects)
+        }
 
     serialize = __getstate__

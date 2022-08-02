@@ -86,22 +86,21 @@ def format_port_config(data, os):
         # format 1-12,15,17-20
         'trunked_vlans': '',
     }
-    if os == "fos":
-        lines = source_config['stdout_lines'][0]
-        for line in lines:
-            # deal switchport mode
-            if line.startswith('switchport mode '):
-                target_config['mode'] = line.replace(
-                    'switchport mode ', '')
-            # deal vlan
-            if line.startswith('switchport access vlan '):
-                target_config['vlan'] = int(line.replace(
-                    'switchport access vlan ', ''))
-            # deal trunked vlans
-            if line.startswith('switchport trunk allowed vlan '):
-                target_config['trunked_vlans'] = line.replace(
-                    'switchport trunk allowed vlan ', '')
-    else:
+    if os != "fos":
         raise exceptions.NetworkRunnerException('invaild os type')
+    lines = source_config['stdout_lines'][0]
+    for line in lines:
+        # deal switchport mode
+        if line.startswith('switchport mode '):
+            target_config['mode'] = line.replace(
+                'switchport mode ', '')
+        # deal vlan
+        if line.startswith('switchport access vlan '):
+            target_config['vlan'] = int(line.replace(
+                'switchport access vlan ', ''))
+        # deal trunked vlans
+        if line.startswith('switchport trunk allowed vlan '):
+            target_config['trunked_vlans'] = line.replace(
+                'switchport trunk allowed vlan ', '')
     # replace source port configuration json to target port configuration json
     return data.replace(source_config_json, json.dumps(target_config))

@@ -49,9 +49,8 @@ class Attribute(object):
         except Exception:
             raise AttributeError("validators must be iterable")
 
-        if serialize_when is not None:
-            if serialize_when not in (0, 1, 2):
-                raise ValueError("invalid value for serialize_when")
+        if serialize_when is not None and serialize_when not in (0, 1, 2):
+            raise ValueError("invalid value for serialize_when")
 
         self.validators.add(TypeValidator(self.type))
 

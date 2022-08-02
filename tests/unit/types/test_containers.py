@@ -95,7 +95,7 @@ def test_map():
     with pytest.raises(TypeError):
         o['test'] = 'test'
 
-    keys = [key for key in o]
+    keys = list(o)
     assert keys == ['foo']
 
     assert len(o) == 1

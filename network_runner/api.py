@@ -60,10 +60,10 @@ class NetworkRunner(object):
 
         :returns: Boolean
         """
-        for n, h in self.inventory.hosts.items():
-            if h.ansible_host == host or n == host:
-                return True
-        return False
+        return any(
+            h.ansible_host == host or n == host
+            for n, h in self.inventory.hosts.items()
+        )
 
     def add_host(self, host):
         """Add host to inventory
@@ -90,7 +90,7 @@ class NetworkRunner(object):
 
         # check for failure
         if result.status == 'failed' or \
-                (result.stats and result.stats.get('failures', [])):
+                    (result.stats and result.stats.get('failures', [])):
             raise exceptions.NetworkRunnerException(' '.join(result.stdout))
 
         return result
@@ -127,8 +127,7 @@ class NetworkRunner(object):
         :param vlan_id: The VLAN's ID to create.
         :param vlan_name: The VLAN's name/description.
         """
-        variables = {'vlan_id': vlan_id, 'vlan_name': vlan_name}
-        variables.update(kwargs)
+        variables = {'vlan_id': vlan_id, 'vlan_name': vlan_name} | kwargs
         return self.play(CREATE_VLAN, hostname, variables)
 
     def list_vlans(self, hostname, **kwargs):
@@ -145,8 +144,7 @@ class NetworkRunner(object):
         :param hostname: The name of the host in Ansible inventory.
         :param vlan_id: The VLAN's ID to delete.
         """
-        variables = {'vlan_id': vlan_id}
-        variables.update(kwargs)
+        variables = {'vlan_id': vlan_id} | kwargs
         return self.play(DELETE_VLAN, hostname, variables)
 
     def conf_access_port(self, hostname, port, vlan_id, **kwargs):
@@ -163,9 +161,12 @@ class NetworkRunner(object):
                        fwding state is named different things on different
                        platforms.
         """
-        variables = {'vlan_id': vlan_id, 'port_name': port,
-                     'port_description': port}
-        variables.update(kwargs)
+        variables = {
+            'vlan_id': vlan_id,
+            'port_name': port,
+            'port_description': port,
+        } | kwargs
+
         return self.play(CONF_ACCESS_PORT, hostname, variables)
 
     def conf_trunk_port(self, hostname, port, vlan_id,
@@ -185,9 +186,13 @@ class NetworkRunner(object):
                        fwding state is named different things on different
                        platforms.
         """
-        variables = {'vlan_id': vlan_id, 'port_name': port,
-                     'port_description': port, 'trunked_vlans': trunked_vlans}
-        variables.update(kwargs)
+        variables = {
+            'vlan_id': vlan_id,
+            'port_name': port,
+            'port_description': port,
+            'trunked_vlans': trunked_vlans,
+        } | kwargs
+
         return self.play(CONF_TRUNK_PORT, hostname, variables)
 
     def add_trunk_vlan(self, hostname, port, vlan_id, **kwargs):
@@ -197,8 +202,7 @@ class NetworkRunner(object):
         :param port: The port to configure.
         :param vlan_id: The VLAN's ID to delete.
         """
-        variables = {'vlan_id': vlan_id, 'port_name': port}
-        variables.update(kwargs)
+        variables = {'vlan_id': vlan_id, 'port_name': port} | kwargs
         return self.play(ADD_TRUNK_VLAN, hostname, variables)
 
     def delete_trunk_vlan(self, hostname, port, vlan_id, **kwargs):
@@ -208,8 +212,7 @@ class NetworkRunner(object):
         :param port: The port to configure.
         :param vlan_id: The VLAN's ID to delete.
         """
-        variables = {'vlan_id': vlan_id, 'port_name': port}
-        variables.update(kwargs)
+        variables = {'vlan_id': vlan_id, 'port_name': port} | kwargs
         return self.play(DELETE_TRUNK_VLAN, hostname, variables)
 
     def delete_port(self, hostname, port, **kwargs):
@@ -218,8 +221,7 @@ class NetworkRunner(object):
         :param hostname: The name of the host in Ansible inventory.
         :param port: The port to configure.
         """
-        variables = {'port_name': port}
-        variables.update(kwargs)
+        variables = {'port_name': port} | kwargs
         return self.play(DELETE_PORT, hostname, variables)
 
     def get_port_conf(self, hostname, port, format=False, **kwargs):
@@ -229,9 +231,7 @@ class NetworkRunner(object):
         :param port: The port to get configuration.
         :param format: Format the port configuration json
         """
-        variables = {'port_name': port}
-        variables.update(kwargs)
-
+        variables = {'port_name': port} | kwargs
         # output the original port configuration json
         if not format:
             self.play(GET_PORT_CONF, hostname, variables)

@@ -87,9 +87,7 @@ class Host(Object):
 
     def deserialize(self, ds):
         assert isinstance(ds, dict)
-        obj = {}
-        for name in self._attributes:
-            obj[name] = ds.pop(name, None)
+        obj = {name: ds.pop(name, None) for name in self._attributes}
         super(Host, self).deserialize(obj)
         self.vars.update(ds)
 

@@ -98,17 +98,19 @@ class Object(with_metaclass(BaseMeta)):
         elif key in dir(self):
             attr = getattr(self, key)
             if isinstance(attr, Attribute):
-                raise AttributeError("attribute '{}' is read only".format(key))
+                raise AttributeError(f"attribute '{key}' is read only")
 
         elif not key.startswith('_'):
-            raise AttributeError("'{}' object has no attribute '{}'".format(
-                self.__class__.__name__, key))
+            raise AttributeError(
+                f"'{self.__class__.__name__}' object has no attribute '{key}'"
+            )
+
 
         self.__dict__[key] = value
 
     def __delattr__(self, key):
         if key not in self._attributes and key in dir(self):
-            raise AttributeError("cannot delete attribute '{}'".format(key))
+            raise AttributeError(f"cannot delete attribute '{key}'")
         self.__setattr__(key, None)
 
     def __eq__(self, other):
@@ -131,21 +133,13 @@ class Object(with_metaclass(BaseMeta)):
 
             if attr.type in (dict, list):
                 if value and attr.serialize_when != SERIALIZE_WHEN_NEVER or \
-                    attr.serialize_when == SERIALIZE_WHEN_ALWAYS:
+                        attr.serialize_when == SERIALIZE_WHEN_ALWAYS:
 
-                    if hasattr(value, 'serialize'):
-                        obj[item] = value.serialize()
-                    else:
-                        obj[item] = value
-
+                    obj[item] = value.serialize() if hasattr(value, 'serialize') else value
             elif value is not None and \
-                attr.serialize_when < SERIALIZE_WHEN_NEVER:
+                    attr.serialize_when < SERIALIZE_WHEN_NEVER:
 
-                if hasattr(value, 'serialize'):
-                    obj[item] = value.serialize()
-                else:
-                    obj[item] = value
-
+                obj[item] = value.serialize() if hasattr(value, 'serialize') else value
         return obj
 
     serialize = __getstate__

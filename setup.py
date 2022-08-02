@@ -16,7 +16,7 @@ def get_data_files(directory):
     # files list with out dirs in it.
     files = [f for f in lst if os.path.isfile(f)]
     # build data structure to return [('dir', ['file', 'file'])]
-    data_files = [('{}{}'.format(os.sep, directory), files)] if files else []
+    data_files = [(f'{os.sep}{directory}', files)] if files else []
     # recurse to build data structure for dirs
     for d in lst:
         if os.path.isdir(d):
@@ -30,7 +30,7 @@ def main():
         long_description = fh.read()
 
     github = 'https://github.com/ansible-network/network-runner/'
-    github_issues = '{}issues'.format(github)
+    github_issues = f'{github}issues'
 
     setuptools.setup(
         name='network-runner',

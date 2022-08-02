@@ -124,7 +124,7 @@ def test_del_boolattr():
     o = Instance()
     assert o.boolattr is None
     o.boolattr = True
-    assert o.boolattr is True
+    assert o.boolattr
     del o.boolattr
     assert o.boolattr is None
 
@@ -135,7 +135,7 @@ def test_del_listattr():
     o.listattr = [1, 2, 3]
     assert o.listattr == [1, 2, 3]
     del o.listattr
-    assert o.listattr == []
+    assert not o.listattr
 
 
 def test_del_dictattr():
@@ -144,7 +144,7 @@ def test_del_dictattr():
     o.dictattr = {'one': 1, 'two': 2, 'three': 3}
     assert o.dictattr == {'one': 1, 'two': 2, 'three': 3}
     del o.dictattr
-    assert o.dictattr == {}
+    assert not o.dictattr
 
 
 def test_strattr_with_defaults():
@@ -169,9 +169,9 @@ def test_boolattr_with_defaults():
     o = InstanceWithDefaults()
     assert o.boolattr is False
     o.boolattr = True
-    assert o.boolattr is True
+    assert o.boolattr
     del o.boolattr
-    assert o.boolattr is False
+    assert not o.boolattr
 
 
 def test_listattr_with_defaults():
